@@ -1,13 +1,23 @@
 {
   "startedAt": "2026-01-31T16:17:00Z",
-  "lastUpdate": "2026-01-31T16:17:00Z",
-  "completed": 11,
-  "inProgress": 0,
+  "lastUpdate": "2026-01-31T16:22:00Z",
+  "completed": 13,
+  "inProgress": 4,
   "upcoming": [],
   "agents": {
-    "frontend": "idle",
-    "backend": "idle",
-    "tester": "idle",
-    "docs": "idle"
-  }
+    "websocket": "completed",
+    "auth": "completed",
+    "notifications": "completed",
+    "search": "completed",
+    "theme": "completed",
+    "mobile": "completed",
+    "export": "running",
+    "shortcuts": "running",
+    "charts": "running",
+    "ai": "running"
+  },
+  "milestones": [
+    {"ts": "16:17", "event": "第三轮开发启动", "completed": 11},
+    {"ts": "16:22", "event": "6个核心功能完成", "completed": 13}
+  ]
 }
