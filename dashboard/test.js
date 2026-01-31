@@ -56,9 +56,10 @@ function addTest(category, name, passed, message = '') {
 }
 
 function logSection(title) {
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`  ${title}`);
-    console.log('='.repeat(60)}\n`);
+    console.log('\n' + '='.repeat(60));
+    console.log('  ' + title);
+    console.log('='.repeat(60) + '\n');
+}
 }
 
 // ============================================
