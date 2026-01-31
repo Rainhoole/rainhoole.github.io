@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>clawVERSE Dashboard</title>
+    <title>clawVERSE Dashboard<script src="dashboard/batch.js"></script>
     <meta name="description" content="clawVERSE Dashboard - 智能管理控制台">
     <meta name="theme-color" content="#0f0f23">
     
@@ -314,6 +314,99 @@
                     <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
                         <kbd>g</kbd> + <kbd>a</kbd> 快速跳转
                     </p>
+                    <!-- 批量操作栏 -->
+                    <div id="batch-action-bar" class="hidden">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="select-all-checkbox"
+                                        onchange="handleSelectAll(this.checked)"
+                                        class="w-5 h-5 rounded border-gray-500 text-indigo-500 focus:ring-indigo-500">
+                                    <span class="text-sm">全选</span>
+                                </label>
+                                <span class="text-gray-400">|</span>
+                                <span class="text-sm">
+                                    已选择 <strong id="selected-count" class="text-indigo-400">0</strong> 个 Agent
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <!-- 状态更新 -->
+                                <select id="batch-status-select" onchange="handleBatchStatusChange(this.value)"
+                                    class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                                    <option value="">更新状态...</option>
+                                    <option value="active">🟢 活跃</option>
+                                    <option value="paused">🟡 暂停</option>
+                                    <option value="maintenance">🔧 维护中</option>
+                                    <option value="archived">⚪ 归档</option>
+                                </select>
+
+                                <!-- 优先级更新 -->
+                                <select id="batch-priority-select" onchange="handleBatchPriorityChange(this.value)"
+                                    class="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                                    <option value="">更新优先级...</option>
+                                    <option value="low">🔵 低</option>
+                                    <option value="medium">🟡 中</option>
+                                    <option value="high">🟠 高</option>
+                                    <option value="critical">🔴 紧急</option>
+                                </select>
+
+                                <!-- 导出 -->
+                                <div class="relative">
+                                    <button onclick="toggleBatchDropdown('export-dropdown')"
+                                        class="bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/50 text-purple-400 px-3 py-2 rounded-lg text-sm transition">
+                                        📤 导出
+                                    </button>
+                                    <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-secondary border border-border-color rounded-lg shadow-xl z-50">
+                                        <button onclick="handleBatchExport('json')" class="block w-full text-left px-4 py-2 text-sm hover:bg-bg-tertiary">
+                                            📄 JSON
+                                        </button>
+                                        <button onclick="handleBatchExport('csv')" class="block w-full text-left px-4 py-2 text-sm hover:bg-bg-tertiary">
+                                            📊 CSV
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 更多操作 -->
+                                <div class="relative">
+                                    <button onclick="toggleBatchDropdown('more-dropdown')"
+                                        class="bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 text-gray-400 px-3 py-2 rounded-lg text-sm transition">
+                                        ⋯ 更多
+                                    </button>
+                                    <div id="more-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-secondary border border-border-color rounded-lg shadow-xl z-50">
+                                        <button onclick="handleBatchAssign()" class="block w-full text-left px-4 py-2 text-sm hover:bg-bg-tertiary">
+                                            👤 分配给用户
+                                        </button>
+                                        <button onclick="handleBatchAddTags()" class="block w-full text-left px-4 py-2 text-sm hover:bg-bg-tertiary">
+                                            🏷️ 添加标签
+                                        </button>
+                                        <button onclick="handleBatchRemoveTags()" class="block w-full text-left px-4 py-2 text-sm hover:bg-bg-tertiary">
+                                            🏷️ 移除标签
+                                        </button>
+                                        <hr class="border-border-color my-1">
+                                        <button onclick="handleBatchDelete()" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-error-color/10">
+                                            🗑️ 删除选中
+                                        </button>
+                                        <button onclick="handleBatchRestore()" class="block w-full text-left px-4 py-2 text-sm text-green-400 hover:bg-success-color/10">
+                                            ♻️ 恢复选中
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button onclick="BatchOperations.clearSelection()" class="text-gray-400 hover:text-white text-sm">
+                                    ✕ 取消选择
+                                </button>
+                            </div>
+                        </div>
+                        <!-- 进度条 -->
+                        <div id="batch-progress" class="hidden mt-3">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                                    <div id="batch-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-pulse" style="width: 0%"></div>
+                                </div>
+                                <span id="batch-progress-text" class="text-xs text-gray-400">处理中...</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">

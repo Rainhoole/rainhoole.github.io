@@ -17,19 +17,19 @@
                 <ul>
                     <li class="active" data-page="overview">
                         <span class="icon">📊</span>
-                        <span class="text">总览</span>
+                        <span class="text" data-translate-key="overview"></span>
                     </li>
                     <li data-page="agents">
                         <span class="icon">🤖</span>
-                        <span class="text">Agent 议会</span>
+                        <span class="text" data-translate-key="agents"></span>
                     </li>
                     <li data-page="proposals">
                         <span class="icon">📝</span>
-                        <span class="text">民主讨论</span>
+                        <span class="text" data-translate-key="proposals"></span>
                     </li>
                     <li data-page="tasks">
                         <span class="icon">📋</span>
-                        <span class="text">任务管理</span>
+                        <span class="text" data-translate-key="tasks"></span>
                     </li>
                     <li data-page="logs">
                         <span class="icon">📜</span>
@@ -52,6 +52,10 @@
                     <button class="search-btn">🔍</button>
                 </div>
                 <div class="toolbar-actions">
+                    <select id="language-select">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
                     <!-- 数据导出按钮组 -->
                     <div class="export-dropdown">
                         <button class="btn btn-primary" id="export-menu-btn">
@@ -104,10 +108,10 @@
     <div class="modal" id="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modal-title">标题</h3>
+                <h3 id="modal-title" data-translate-key="modalTitle">标题</h3>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
-            <div class="modal-body" id="modal-body">
+            <div class="modal-body" id="modal-body" data-translate-key="modalContent">
                 内容
             </div>
         </div>
