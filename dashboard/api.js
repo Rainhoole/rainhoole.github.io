@@ -1,7 +1,7 @@
 const http = require('http');
 const url = require('url');
-const fs = require('fs');
-const path = require('path');
+
+const MAX_BODY_SIZE = 1 * 1024 * 1024; // 1MB
 
 // ============== 模拟数据存储 ==============
 const dataStore = {
@@ -56,45 +56,72 @@ function getAllTasks() {
   return dataStore.tasks;
 }
 
+// ============== 通用响应与解析 ==============
+function sendJson(res, statusCode, payload) {
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,PATCH,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
+  res.end(JSON.stringify(payload));
+}
+
+function getJsonBody(req, res, callback) {
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk;
+    if (body.length > MAX_BODY_SIZE) {
+      sendJson(res, 413, { success: false, error: 'Payload too large' });
+      req.socket.destroy();
+    }
+  });
+  req.on('end', () => {
+    if (!body) return callback(null, {});
+    try {
+      const json = JSON.parse(body);
+      return callback(null, json);
+    } catch (err) {
+      return sendJson(res, 400, { success: false, error: 'Invalid JSON payload' });
+    }
+  });
+}
+
 // ============== API 路由处理 ==============
 const routes = {
   // /api/agents - Agent 管理
   'GET:/api/agents': (req, res) => {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: dataStore.agents }));
+    sendJson(res, 200, { success: true, data: dataStore.agents });
   },
   
   'POST:/api/agents': (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const agent = JSON.parse(body);
+    getJsonBody(req, res, (err, agent) => {
+      if (!agent || typeof agent.name !== 'string' || !agent.name.trim()) {
+        return sendJson(res, 400, { success: false, error: 'Agent name is required' });
+      }
       agent.id = `agent-${Date.now()}`;
       agent.status = 'active';
       agent.lastSeen = new Date().toISOString();
       dataStore.agents.push(agent);
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: agent }));
+      return sendJson(res, 201, { success: true, data: agent });
     });
   },
 
   // /api/proposals - 提案管理
   'GET:/api/proposals': (req, res) => {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: dataStore.proposals }));
+    sendJson(res, 200, { success: true, data: dataStore.proposals });
   },
   
   'POST:/api/proposals': (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const proposal = JSON.parse(body);
+    getJsonBody(req, res, (err, proposal) => {
+      if (!proposal || typeof proposal.title !== 'string' || !proposal.title.trim()) {
+        return sendJson(res, 400, { success: false, error: 'Proposal title is required' });
+      }
       proposal.id = `prop-${Date.now()}`;
       proposal.status = 'pending';
       proposal.createdAt = new Date().toISOString();
       dataStore.proposals.push(proposal);
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: proposal }));
+      return sendJson(res, 201, { success: true, data: proposal });
     });
   },
 
@@ -105,48 +132,54 @@ const routes = {
     if (level) {
       logs = logs.filter(log => log.level === level);
     }
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: logs }));
+    sendJson(res, 200, { success: true, data: logs });
   },
   
   'POST:/api/logs': (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const log = JSON.parse(body);
+    getJsonBody(req, res, (err, log) => {
+      if (!log || typeof log.message !== 'string' || !log.message.trim()) {
+        return sendJson(res, 400, { success: false, error: 'Log message is required' });
+      }
+      if (!['info', 'warn', 'error'].includes(log.level)) {
+        return sendJson(res, 400, { success: false, error: 'Invalid log level' });
+      }
       log.id = `log-${Date.now()}`;
       log.timestamp = new Date().toISOString();
       dataStore.logs.push(log);
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: log }));
+      return sendJson(res, 201, { success: true, data: log });
     });
   },
 
   // /api/tasks - 任务状态管理
   'GET:/api/tasks': (req, res) => {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: true, data: getAllTasks() }));
+    sendJson(res, 200, { success: true, data: getAllTasks() });
   },
   
   'POST:/api/tasks': (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const { name, description } = JSON.parse(body);
-      const task = createTask(name, description);
-      res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: task }));
+    getJsonBody(req, res, (err, body) => {
+      const { name, description } = body || {};
+      if (typeof name !== 'string' || !name.trim()) {
+        return sendJson(res, 400, { success: false, error: 'Task name is required' });
+      }
+      const task = createTask(name.trim(), description || '');
+      return sendJson(res, 201, { success: true, data: task });
     });
   },
   
   'PATCH:/api/tasks': (req, res) => {
-    let body = '';
-    req.on('data', chunk => body += chunk);
-    req.on('end', () => {
-      const { taskId, status } = JSON.parse(body);
+    getJsonBody(req, res, (err, body) => {
+      const { taskId, status } = body || {};
+      if (!taskId) {
+        return sendJson(res, 400, { success: false, error: 'taskId is required' });
+      }
+      if (!Object.values(taskStatus).includes(status)) {
+        return sendJson(res, 400, { success: false, error: 'Invalid status' });
+      }
       const task = updateTaskStatus(taskId, status);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, data: task }));
+      if (!task) {
+        return sendJson(res, 404, { success: false, error: 'Task not found' });
+      }
+      return sendJson(res, 200, { success: true, data: task });
     });
   }
 };
@@ -158,12 +191,15 @@ const server = http.createServer((req, res) => {
   const method = req.method;
   const pathname = url.parse(req.url).pathname;
   const routeKey = `${method}:${pathname}`;
+
+  if (method === 'OPTIONS') {
+    return sendJson(res, 204, { success: true });
+  }
   
   if (routes[routeKey]) {
     routes[routeKey](req, res);
   } else {
-    res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: false, error: 'Not Found' }));
+    sendJson(res, 404, { success: false, error: 'Not Found' });
   }
 });
 

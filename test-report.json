@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "project": "Rainhoole Dashboard",
+    "generatedAt": "2026-01-31T16:18:01.247Z",
+    "tester": "AI Testing Agent",
+    "version": "1.0.0"
+  },
+  "results": {
+    "ui": [
+      {
+        "name": "HTML文件存在性: index.html",
+        "passed": true,
+        "message": "文件存在 (/tmp/rainhoole-dashboard/index.html)",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "HTML文件存在性: dashboard/index.html",
+        "passed": true,
+        "message": "文件存在 (/tmp/rainhoole-dashboard/dashboard/index.html)",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "DOCTYPE声明存在",
+        "passed": true,
+        "message": "正确包含 <!DOCTYPE html>",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "字符编码设置",
+        "passed": true,
+        "message": "正确设置 UTF-8 编码",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "移动端视口设置",
+        "passed": true,
+        "message": "正确设置 viewport meta 标签",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "页面标题设置",
+        "passed": true,
+        "message": "正确设置页面标题",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "主容器存在",
+        "passed": true,
+        "message": "包含主容器元素",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "主标题存在",
+        "passed": true,
+        "message": "包含 <h1> 主标题",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "脚本标签检查",
+        "passed": false,
+        "message": "脚本标签可能存在问题",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "内联样式检查",
+        "passed": true,
+        "message": "包含内联 CSS 样式",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      }
+    ],
+    "api": [
+      {
+        "name": "API端点存在: /api/health",
+        "passed": true,
+        "message": "定义API端点: GET /api/health (健康检查接口)",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "API端点存在: /api/status",
+        "passed": true,
+        "message": "定义API端点: GET /api/status (状态查询接口)",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "API端点存在: /api/data",
+        "passed": true,
+        "message": "定义API端点: GET /api/data (数据获取接口)",
+        "timestamp": "2026-01-31T16:18:01.246Z"
+      },
+      {
+        "name": "数据验证: 邮箱格式验证",
+        "passed": true,
+        "message": "有效输入: ✓, 无效输入过滤: ✓",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "数据验证: URL格式验证",
+        "passed": true,
+        "message": "有效输入: ✓, 无效输入过滤: ✓",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "数据验证: 用户名格式验证",
+        "passed": true,
+        "message": "有效输入: ✓, 无效输入过滤: ✓",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      }
+    ],
+    "quality": [
+      {
+        "name": "必要文件存在: index.html",
+        "passed": true,
+        "message": "文件存在: index.html",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "必要文件存在: dashboard/README.md",
+        "passed": true,
+        "message": "文件存在: dashboard/README.md",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "必要文件存在: dashboard/config.py",
+        "passed": true,
+        "message": "文件存在: dashboard/config.py",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "HTML lang属性",
+        "passed": true,
+        "message": "设置了语言属性",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "图片alt属性",
+        "passed": true,
+        "message": "图片包含 alt 属性",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "Meta description",
+        "passed": false,
+        "message": "缺少 SEO 描述",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "内联样式使用",
+        "passed": true,
+        "message": "内联样式使用: 0 处 (建议 < 5)",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "文件结尾换行",
+        "passed": true,
+        "message": "文件正确以换行符结尾",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "异常处理",
+        "passed": false,
+        "message": "缺少异常处理",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "类型注解",
+        "passed": true,
+        "message": "使用类型注解",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "Git版本控制",
+        "passed": true,
+        "message": "项目使用 Git 版本控制",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      },
+      {
+        "name": "README文档",
+        "passed": false,
+        "message": "README 内容过短",
+        "timestamp": "2026-01-31T16:18:01.247Z"
+      }
+    ],
+    "summary": {
+      "total": 28,
+      "passed": 24,
+      "failed": 4,
+      "pending": 0
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "测试失败",
+      "message": "有 4 个测试用例未通过，请检查失败原因"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "代码质量",
+      "message": "部分代码质量检查未通过，建议优化"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "project": "Rainhoole Dashboard",
+    "checkTime": "1769875971.4133356",
+    "checkType": "Code Quality Audit"
+  },
+  "summary": {
+    "passed": 14,
+    "warnings": 1,
+    "issues": 0,
+    "total": 15
+  },
+  "details": {
+    "passed": [
+      "文件存在: index.html",
+      "文件存在: README.md",
+      "文件存在: dashboard/README.md",
+      "文件存在: dashboard/config.py",
+      "HTML lang 属性已设置",
+      "字符编码已设置",
+      "移动端视口已配置",
+      "页面标题已设置",
+      "无图片需要 alt 属性",
+      "使用类型注解",
+      "包含文档字符串",
+      "常量命名规范 (行 14)",
+      "常量命名规范 (行 17)",
+      "常量命名规范 (行 21)"
+    ],
+    "warnings": [
+      "Python 代码缺少异常处理"
+    ],
+    "issues": []
+  },
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "category": "Warnings",
+      "message": "发现 1 个警告，建议优化"
+    }
+  ]
+}

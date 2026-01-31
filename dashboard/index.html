@@ -74,6 +74,79 @@
             }
         }
     </script>
+    <script>
+        // Particle effect
+        window.onload = function() {
+            var canvas = document.getElementById('particleCanvas');
+            if (!canvas) return; // 防止 canvas 不存在时出错
+            
+            var ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            var particlesArray;
+
+            function Particle(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+
+            Particle.prototype.draw = function() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            Particle.prototype.update = function() {
+                if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+                    this.directionY = -this.directionY;
+                }
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+
+            function init() {
+                particlesArray = [];
+                var numberOfParticles = (canvas.height * canvas.width) / 9000;
+                for (var i = 0; i < numberOfParticles; i++) {
+                    var size = (Math.random() * 2) + 1;
+                    var x = Math.random() * (canvas.width - size * 2);
+                    var y = Math.random() * (canvas.height - size * 2);
+                    var directionX = (Math.random() * 0.2) - 0.1;
+                    var directionY = (Math.random() * 0.2) - 0.1;
+                    var color = '#8b5cf6';
+                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (var i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+            }
+
+            init();
+            animate();
+
+            window.addEventListener('resize', function() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                init();
+            });
+        }
+    </script>
     <style>
         :root {
             --primary: #6366f1;
@@ -191,12 +264,27 @@
             .sidebar.open { left: 0; }
             .main-content { margin-left: 0; }
         }
-        @media (min-width: 769px) {
-            .main-content { margin-left: 280px; }
+        
+        .page-enter-active {
+            animation: slide-in-right 0.5s ease-out forwards;
         }
-    </style>
+
+        @keyframes slide-in-right {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
 </head>
+
 <body class="min-h-screen">
+    <canvas id="particleCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></canvas>
+
     <!-- Mobile Menu Toggle -->
     <button id="mobileMenuToggle" class="fixed top-4 left-4 z-50 lg:hidden glass px-3 py-2 rounded-lg" onclick="toggleSidebar()">
         <i data-lucide="menu" class="w-6 h-6"></i>
@@ -216,31 +304,31 @@
         
         <nav class="flex-1 py-4 overflow-y-auto">
             <div class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">主导航</div>
-            <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 text-white" onclick="showPage('dashboard')">
+            <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 text-white" onclick="showPage('dashboard', event)">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>控制台</span>
                 <span class="ml-auto badge bg-emerald-500/20 text-emerald-400">9</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('agents')">
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('agents', event)">
                 <i data-lucide="users" class="w-5 h-5"></i><span>Agent 议会</span>
                 <span class="ml-auto badge bg-blue-500/20 text-blue-400">5</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('discussions')">
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('discussions', event)">
                 <i data-lucide="message-square" class="w-5 h-5"></i><span>民主讨论</span>
                 <span class="ml-auto badge bg-amber-500/20 text-amber-400">3</span>
             </a>
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('logs')">
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('logs', event)">
                 <i data-lucide="activity" class="w-5 h-5"></i><span>操作日志</span>
             </a>
             
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">开发</div>
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('devteam')">
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('devteam', event)">
                 <i data-lucide="code" class="w-5 h-5"></i>
                 <span>开发团队</span>
                 <span class="ml-auto badge bg-red-500/20 text-red-400">4</span>
             </a>
 
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">系统</div>
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('settings')">
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('settings', event)">
                 <i data-lucide="settings" class="w-5 h-5"></i><span>设置中心</span>
             </a>
         </nav>
@@ -381,7 +469,7 @@
                     <div class="lg:col-span-2 card p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-lg font-semibold">🤖 Agent 实时状态</h3>
-                            <a href="#" onclick="showPage('agents')" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
+                            <a href="#" onclick="showPage('agents', event)" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agentGrid"></div>
                     </div>
@@ -389,7 +477,7 @@
                     <div class="card p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-lg font-semibold">⚡ 最新活动</h3>
-                            <a href="#" onclick="showPage('logs')" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
+                            <a href="#" onclick="showPage('logs', event)" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
                         </div>
                         <div class="space-y-4" id="activityFeed"></div>
                     </div>
@@ -499,6 +587,12 @@
             renderActivityFeed();
             renderLogs();
             initCharts();
+            
+            // Inject Dev Team Page
+            const pageContent = document.getElementById('pageContent');
+            if (pageContent) {
+                pageContent.innerHTML += showDevTeamPage();
+            }
         });
         
         function renderAgentGrid() {
@@ -614,22 +708,66 @@
         
         function initCharts() {
             // Performance Chart
-            new Chart(document.getElementById('performanceChart'), {
-                type: 'line',
-                data: {
-                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-                    datasets: [{
-                        label: '任务完成',
-                        data: [65, 78, 82, 75, 88, 92, 85],
-                        borderColor: '#6366f1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+            const perfCtx = document.getElementById('performanceChart');
+            if (perfCtx) {
+                new Chart(perfCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [{
+                            label: '任务完成',
+                            data: [65, 78, 82, 75, 88, 92, 85],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Agent Distribution Chart
+            const distCtx = document.getElementById('agentDistChart');
+            if (distCtx) {
+                new Chart(distCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['在线', '忙碌', '离线'],
+                        datasets: [{
+                            data: [3, 1, 1],
+                            backgroundColor: ['#10b981', '#f59e0b', '#6b7280'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#9ca3af' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
 
         // Dev Team Page
         function showDevTeamPage() {
@@ -757,7 +895,7 @@
         }
         
         // Page navigation
-        function showPage(page) {
+        function showPage(page, evt) {
             document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
             const pageEl = document.getElementById('page-' + page);
             if (pageEl) {
@@ -766,7 +904,9 @@
             }
             
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.target.closest('.nav-item')?.classList.add('active');
+            if (evt && evt.target) {
+                evt.target.closest('.nav-item')?.classList.add('active');
+            }
             
             document.getElementById('currentPage').textContent = {
                 'dashboard': '控制台',

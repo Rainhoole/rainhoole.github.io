@@ -15,8 +15,8 @@ const CONFIG = {
     API_BASE_URL: 'http://localhost:5000/api',
     PROJECT_ROOT: '/tmp/rainhoole-dashboard',
     TEST_REPORT_PATH: '/tmp/rainhoole-dashboard/test-report.json',
-    HTML_FILES: ['index.html'],
-    JS_FILES: [],
+    HTML_FILES: ['index.html', 'dashboard/index.html'],
+    JS_FILES: ['dashboard/api.js', 'dashboard/test.js'],
     CSS_FILES: []
 };
 
@@ -60,7 +60,6 @@ function logSection(title) {
     console.log('  ' + title);
     console.log('='.repeat(60) + '\n');
 }
-}
 
 // ============================================
 // UI 测试用例
@@ -87,7 +86,7 @@ async function runUITests() {
             hasDoctype ? '正确包含 <!DOCTYPE html>' : '缺少 DOCTYPE 声明');
         
         // 检查 meta charset
-        const hasCharset = content.includes('charset="utf-8"') || content.includes("charset='utf-8'");
+        const hasCharset = content.toLowerCase().includes('charset="utf-8"') || content.toLowerCase().includes("charset='utf-8'");
         addTest('ui', '字符编码设置', hasCharset, 
             hasCharset ? '正确设置 UTF-8 编码' : '缺少字符编码设置');
         
@@ -112,9 +111,11 @@ async function runUITests() {
             hasH1 ? '包含 <h1> 主标题' : '缺少 <h1> 主标题');
         
         // 检查 JavaScript 引用
-        const hasScript = content.includes('<script') || !content.includes('script');
-        addTest('ui', '脚本标签检查', hasScript, 
-            hasScript ? '脚本标签语法正确' : '脚本标签可能存在问题');
+        const scriptOpenCount = (content.match(/<script/g) || []).length;
+        const scriptCloseCount = (content.match(/<\/script>/g) || []).length;
+        const scriptBalanced = scriptOpenCount > 0 && scriptOpenCount === scriptCloseCount;
+        addTest('ui', '脚本标签检查', scriptBalanced, 
+            scriptBalanced ? `脚本标签语法正确 (${scriptOpenCount} 个)` : '脚本标签可能存在问题');
     }
 
     // 3. CSS 样式检查
