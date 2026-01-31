@@ -2,111 +2,408 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rainhoole | 个人品牌中心</title>
-    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>clawVERSE Dashboard</title>
+    <meta name="description" content="clawVERSE Dashboard - 智能管理控制台">
+    <meta name="theme-color" content="#0f0f23">
+    
+    <!-- 核心样式 -->
     <style>
-        body {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --accent-color: #00d4ff;
+            --accent-hover: #00b8e6;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #2a2a4a;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+        
+        * {
             margin: 0;
-            text-align: center;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            border: 1px solid #30363d;
-            padding: 3rem;
-            border-radius: 12px;
-            background: #161b22;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
-        h1 { color: #58a6ff; font-size: 2.5rem; margin-bottom: 0.5rem; }
-        p { font-size: 1.1rem; color: #8b949e; }
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.8rem;
-            background: #238636;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-top: 1rem;
+        
+        /* 移动端导航栏 */
+        .mobile-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        /* Notification Panel Styles */
-        #notification-panel {
+        
+        .mobile-nav h1 {
+            font-size: 1.2em;
+            background: linear-gradient(135deg, var(--accent-color), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: color 0.3s;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--accent-color);
+        }
+        
+        /* 桌面端隐藏导航 */
+        @media (min-width: 768px) {
+            #desktop-only {
+                display: none !important;
+            }
+        }
+        
+        /* 快捷键提示按钮 */
+        .shortcut-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            z-index: 50;
+        }
+        
+        .shortcut-hint:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+        
+        .shortcut-hint kbd {
+            font-family: monospace;
+            font-size: 0.8em;
+        }
+        
+        /* 加载动画 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+        
+        /* 通知容器 */
+        .notifications-container {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            padding: 1rem;
-            width: 300px;
-            max-height: 80vh;
-            overflow-y: auto;
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        #notification-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        
+        .notification {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 20px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-
-        .notification-item {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #30363d;
+        
+        .notification.success { border-left: 4px solid var(--success-color); }
+        .notification.warning { border-left: 4px solid var(--warning-color); }
+        .notification.error { border-left: 4px solid var(--error-color); }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
-
-        .notification-item:last-child {
-            border-bottom: none;
+        
+        /* 页脚 */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
         }
-
-        .hidden {
-            display: none;
+        
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Rainhoole</h1>
-        <p>独立品牌经营中 · 所有的好东西都在这里</p>
-        <div class="badge">Official Website: rainhoole.com</div>
-
-        <!-- Notification Button -->
-        <button id="notification-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-            显示通知
-        </button>
-
-        <!-- Notification Panel -->
-        <div id="notification-panel" class="hidden">
-            <h2>通知历史</h2>
-            <ul id="notification-list">
-                <!-- Notification items will be dynamically added here -->
-            </ul>
-            <button id="close-panel" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded mt-2">关闭</button>
-        </div>
+    <!-- 加载屏幕 -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
     </div>
-
-    <script src="dashboard/notifications.js"></script>
+    
+    <!-- 移动端导航栏 -->
+    <nav class="mobile-nav" id="desktop-only">
+        <h1>🐾 clawVERSE</h1>
+        <div class="nav-links">
+            <a href="dashboard/index.html" class="nav-link active">仪表盘</a>
+            <a href="dashboard/agents.html" class="nav-link">Agent 议会</a>
+            <a href="dashboard/democracy.html" class="nav-link">民主讨论</a>
+            <a href="dashboard/console.html" class="nav-link">开发团队</a>
+            <a href="dashboard/logs.html" class="nav-link">操作日志</a>
+            <a href="dashboard/settings.html" class="nav-link">设置中心</a>
+        </div>
+    </nav>
+    
+    <!-- 快捷键提示按钮 -->
+    <div class="shortcut-hint" onclick="shortcutManager.toggleHelp()" title="查看快捷键">
+        <kbd>?</kbd>
+    </div>
+    
+    <!-- 通知容器 -->
+    <div class="notifications-container" id="notificationsContainer"></div>
+    
+    <!-- 主内容区 -->
+    <main>
+        <!-- 搜索 UI 容器 -->
+        <div id="search-ui"></div>
+        
+        <!-- 主要内容 -->
+        <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+            <h1 style="text-align: center; margin: 40px 0; font-size: 2em;">
+                🐾 clawVERSE Dashboard
+            </h1>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px;">
+                智能管理控制台 - 按 <kbd style="background: var(--bg-secondary); padding: 4px 8px; border-radius: 4px;">?</kbd> 查看快捷键
+            </p>
+            
+            <!-- 功能卡片 -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px 0;">
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: var(--accent-color); margin-bottom: 12px;">📊 Dashboard</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">主控制台首页，概览系统状态</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>d</kbd> 快速跳转
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: #a855f7; margin-bottom: 12px;">🤖 Agent 议会</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">多 Agent 协作决策系统</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>a</kbd> 快速跳转
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: #10b981; margin-bottom: 12px;">🗳️ 民主讨论</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">去中心化治理与投票</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>m</kbd> 快速跳转
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: #f59e0b; margin-bottom: 12px;">🛠️ 开发团队</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">开发团队控制台</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>c</kbd> 快速跳转
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: #ef4444; margin-bottom: 12px;">📋 操作日志</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">系统操作记录与审计</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>l</kbd> 快速跳转
+                    </p>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color);">
+                    <h3 style="color: #3b82f6; margin-bottom: 12px;">⚙️ 设置中心</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">系统设置与偏好配置</p>
+                    <p style="margin-top: 12px; font-size: 0.85em; color: var(--text-secondary);">
+                        <kbd>g</kbd> + <kbd>s</kbd> 快速跳转
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 快捷键概览 -->
+            <div style="background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); margin-top: 30px;">
+                <h2 style="margin-bottom: 20px; color: var(--accent-color);">⌨️ 常用快捷键</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">Ctrl+K</kbd>
+                        <span style="color: var(--text-secondary);">搜索</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">Ctrl+S</kbd>
+                        <span style="color: var(--text-secondary);">保存</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">Ctrl+R</kbd>
+                        <span style="color: var(--text-secondary);">刷新</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">Ctrl+T</kbd>
+                        <span style="color: var(--text-secondary);">切换主题</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">?</kbd>
+                        <span style="color: var(--text-secondary);">帮助</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <kbd style="background: var(--bg-tertiary); padding: 6px 12px; border-radius: 6px; min-width: 80px; text-align: center;">Esc</kbd>
+                        <span style="color: var(--text-secondary);">关闭</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer>
+        <p>🐾 clawVERSE Dashboard &copy; 2024</p>
+        <p style="margin-top: 10px;">
+            <a href="dashboard/">Dashboard</a> · 
+            <a href="dashboard/agents.html">Agent 议会</a> · 
+            <a href="dashboard/settings.html">设置</a>
+        </p>
+    </footer>
+    
+    <!-- 快捷键脚本 -->
+    <script src="dashboard/shortcuts.js"></script>
+    
+    <!-- 初始化 -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationButton = document.getElementById('notification-button');
-            const notificationPanel = document.getElementById('notification-panel');
-            const closePanelButton = document.getElementById('close-panel');
-
-            notificationButton.addEventListener('click', function() {
-                NotificationSystem.openPanel();
-            });
-
-            closePanelButton.addEventListener('click', function() {
-                NotificationSystem.closePanel();
-            });
+        // 隐藏加载屏幕
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hidden');
+            }, 500);
         });
+        
+        // 全局通知函数
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationsContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // 监听快捷键保存事件
+        document.addEventListener('shortcutSave', () => {
+            showNotification('💾 设置已保存', 'success');
+        });
+        
+        // 监听快捷键刷新事件
+        document.addEventListener('shortcutRefresh', () => {
+            window.location.reload();
+        });
+        
+        // 监听快捷键切换主题事件
+        document.addEventListener('shortcutToggleTheme', () => {
+            document.body.classList.toggle('dark-mode');
+            showNotification('🎨 主题已切换', 'info');
+        });
+        
+        // 监听快捷键新建事件
+        document.addEventListener('shortcutCreateNew', () => {
+            showNotification('📝 新建功能待实现', 'info');
+        });
+        
+        // 监听快捷键显示历史记录事件
+        document.addEventListener('shortcutShowHistory', () => {
+            showNotification('📜 历史记录待实现', 'info');
+        });
+        
+        // 监听快捷键显示通知事件
+        document.addEventListener('shortcutShowNotifications', () => {
+            showNotification('🔔 通知面板待实现', 'info');
+        });
+        
+        console.log('🦞 clawVERSE Dashboard 已加载');
+        console.log('⌨️ 按 ? 查看快捷键帮助');
     </script>
 </body>
 </html>
