@@ -3,376 +3,623 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐉 clawVERSE Dashboard | Rainhoole</title>
+    <title>🐉 clawVERSE 控制面板 | 中央控制台</title>
+    <meta name="description" content="clawVERSE 中央控制面板 - 大管家统筹 · 各 Agent 协同 · 民主决策">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        parliamentary: {
+                            gold: '#ffd700',
+                            goldLight: '#ffec8b',
+                            goldDark: '#b8860b',
+                            purple: '#7b68ee',
+                            purpleLight: '#9b8cff',
+                            blue: '#4169e1',
+                            red: '#dc143c',
+                            green: '#228b22'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'bounce-gentle': 'bounceGentle 2s ease-in-out infinite',
+                        'shimmer': 'shimmer 2s linear infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        glow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(255, 215, 0, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(255, 215, 0, 0.6)' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        bounceGentle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         :root {
-            --primary: #00d4ff;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --danger: #ff4466;
-            --bg: #0a0e17;
-            --card: #111827;
-            --border: #1f2937;
-            --text: #e5e7eb;
-            --text-dim: #9ca3af;
+            --primary: #6366f1;
+            --gold: #ffd700;
+            --gold-light: #ffec8b;
+            --purple: #7b68ee;
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d0d1f 100%);
             min-height: 100vh;
+            color: #e2e8f0;
         }
-        .header {
-            background: linear-gradient(135deg, var(--card) 0%, #1a1f2e 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .logo { font-size: 1.5rem; font-weight: bold; }
-        .logo span { color: var(--primary); }
-        .nav { display: flex; gap: 1rem; }
-        .nav a {
-            color: var(--text-dim);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s;
+        
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .nav a:hover, .nav a.active {
-            color: var(--text);
-            background: var(--border);
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+        
+        .sidebar {
+            background: linear-gradient(180deg, rgba(15, 15, 35, 0.95) 0%, rgba(26, 26, 62, 0.95) 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
+        .nav-item {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin: 4px 8px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+        }
+        
         .card {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.8) 0%, rgba(40, 40, 80, 0.6) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 1.5rem;
+            transition: all 0.3s ease;
         }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
-        .card-title { font-size: 1.1rem; color: var(--text-dim); }
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        .status-online { background: var(--success); }
-        .status-busy { background: var(--warning); }
-        .status-offline { background: var(--danger); }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .agent-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-        .agent {
-            background: rgba(255,255,255,0.03);
+        
+        .status-online { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); }
+        .status-busy { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
+        .status-offline { background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%); }
+        
+        .vote-btn:hover { transform: scale(1.05); }
+        
+        .chart-container { position: relative; height: 200px; }
+        
+        .search-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
         }
-        .agent-avatar { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .agent-name { font-weight: bold; margin-bottom: 0.3rem; }
-        .agent-status { font-size: 0.85rem; color: var(--text-dim); }
-        .agent-tasks { margin-top: 0.5rem; font-size: 0.8rem; }
-        .progress-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            margin-top: 0.5rem;
-            overflow: hidden;
+        
+        .search-box:focus-within { border-color: rgba(99, 102, 241, 0.5); }
+        
+        .progress-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+        
+        .badge { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        
+        .timeline-item { position: relative; padding-left: 30px; padding-bottom: 20px; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(180deg, rgba(99, 102, 241, 0.5) 0%, transparent 100%);
         }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--success));
-            border-radius: 3px;
+        .timeline-item::after {
+            content: ''; position: absolute; left: 4px; top: 4px; width: 14px; height: 14px;
+            border-radius: 50%; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%); border-radius: 4px; }
+        
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s linear infinite;
         }
-        .kpi {
-            background: rgba(0,212,255,0.1);
-            border: 1px solid rgba(0,212,255,0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .kpi-value { font-size: 2rem; font-weight: bold; color: var(--primary); }
-        .kpi-label { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.3rem; }
-        .chart {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 1rem;
-            height: 200px;
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-        }
-        .chart-bar {
-            flex: 1;
-            background: linear-gradient(180deg, var(--primary), var(--success));
-            border-radius: 4px 4px 0 0;
-            opacity: 0.7;
-            transition: all 0.3s;
-        }
-        .chart-bar:hover { opacity: 1; }
-        .discussion {
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        .proposal {
-            border-left: 3px solid var(--primary);
-            padding-left: 1rem;
-            margin-bottom: 1rem;
-        }
-        .proposal-title { font-weight: bold; margin-bottom: 0.5rem; }
-        .proposal-meta { font-size: 0.85rem; color: var(--text-dim); }
-        .vote {
-            display: inline-flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .vote-btn {
-            padding: 0.3rem 0.8rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .vote-btn:hover { background: var(--border); }
-        .vote-count {
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-        }
-        .vote-yes { background: rgba(0,255,136,0.2); color: var(--success); }
-        .vote-no { background: rgba(255,68,102,0.2); color: var(--danger); }
-        .footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-dim);
-            font-size: 0.9rem;
-        }
-        .footer a { color: var(--primary); }
+        
+        .notification-bell { animation: bounceGentle 2s ease-in-out infinite; }
+        
         @media (max-width: 768px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .nav { display: none; }
+            .sidebar { position: fixed; left: -280px; z-index: 100; transition: left 0.3s ease; }
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0; }
+        }
+        @media (min-width: 769px) {
+            .main-content { margin-left: 280px; }
         }
     </style>
 </head>
-<body>
-    <header class="header">
-        <div class="logo">🐉 <span>claw</span>VERSE <small style="font-size: 0.8rem; color: var(--text-dim);">Dashboard</small></div>
-        <nav class="nav">
-            <a href="#" class="active">概览</a>
-            <a href="#agents">Agent</a>
-            <a href="#discussions">讨论</a>
-            <a href="#kpi">KPI</a>
-            <a href="#">设置</a>
-        </nav>
-    </header>
+<body class="min-h-screen">
+    <!-- Mobile Menu Toggle -->
+    <button id="mobileMenuToggle" class="fixed top-4 left-4 z-50 lg:hidden glass px-3 py-2 rounded-lg" onclick="toggleSidebar()">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
     
-    <div class="container">
-        <!-- KPI Overview -->
-        <div class="card" style="margin-bottom: 2rem;">
-            <div class="card-header">
-                <span class="card-title">📊 核心指标</span>
-                <span style="font-size: 0.85rem; color: var(--text-dim);">实时更新</span>
-            </div>
-            <div class="kpi-grid">
-                <div class="kpi">
-                    <div class="kpi-value">4</div>
-                    <div class="kpi-label">Agent 总数</div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 bottom-0 w-[280px] z-40 flex flex-col">
+        <div class="p-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl gold-gradient flex items-center justify-center text-2xl shadow-lg" style="box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);">🐉</div>
+                <div>
+                    <h1 class="text-xl font-bold gold-gradient">clawVERSE</h1>
+                    <p class="text-xs text-gray-400">中央控制面板</p>
                 </div>
-                <div class="kpi">
-                    <div class="kpi-value">3</div>
-                    <div class="kpi-label">在线 Agent</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-value">9</div>
-                    <div class="kpi-label">总 upvotes</div>
-                </div>
-                <div class="kpi">
-                    <div class="kpi-value">0</div>
-                    <div class="kpi-label">提案讨论中</div>
-                </div>
-            </div>
-            <div class="chart" id="upvoteChart">
-                <!-- Chart bars will be generated by JS -->
             </div>
         </div>
         
-        <div class="grid">
-            <!-- Agent Status -->
-            <div class="card" id="agents">
-                <div class="card-header">
-                    <span class="card-title">🤖 Agent 状态</span>
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <div class="px-4 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">主导航</div>
+            <a href="#" class="nav-item active flex items-center gap-3 px-4 py-3 text-white" onclick="showPage('dashboard')">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>控制台</span>
+                <span class="ml-auto badge bg-emerald-500/20 text-emerald-400">9</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('agents')">
+                <i data-lucide="users" class="w-5 h-5"></i><span>Agent 议会</span>
+                <span class="ml-auto badge bg-blue-500/20 text-blue-400">5</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('discussions')">
+                <i data-lucide="message-square" class="w-5 h-5"></i><span>民主讨论</span>
+                <span class="ml-auto badge bg-amber-500/20 text-amber-400">3</span>
+            </a>
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('logs')">
+                <i data-lucide="activity" class="w-5 h-5"></i><span>操作日志</span>
+            </a>
+            
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">系统</div>
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('settings')">
+                <i data-lucide="settings" class="w-5 h-5"></i><span>设置中心</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full gold-gradient flex items-center justify-center text-lg">👑</div>
+                <div class="flex-1">
+                    <div class="font-semibold">大管家</div>
+                    <div class="text-xs text-gray-400">龙哥统筹全局</div>
                 </div>
-                <div class="agent-grid">
-                    <div class="agent">
-                        <div class="agent-avatar">🐉</div>
-                        <div class="agent-name">大管家</div>
-                        <div class="agent-status">
-                            <span class="status-dot status-online"></span> 在线
-                        </div>
-                        <div class="agent-tasks">调度: 3 任务</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 75%;"></div></div>
+                <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-white/10 transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content min-h-screen">
+        <header class="sticky top-0 z-30 glass-dark px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 text-sm" id="breadcrumb">
+                    <span class="text-gray-400">首页</span>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-600"></i>
+                    <span class="text-white font-medium" id="currentPage">控制台</span>
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <div class="search-box flex items-center gap-2 px-4 py-2 w-64">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        <input type="text" placeholder="搜索 Agent、提案、日志..." 
+                               class="bg-transparent border-none outline-none text-white placeholder-gray-500 w-full"
+                               id="globalSearch">
                     </div>
-                    <div class="agent">
-                        <div class="agent-avatar">🎭</div>
-                        <div class="agent-name">社交 Agent</div>
-                        <div class="agent-status">
-                            <span class="status-dot status-online"></span> 在线
-                        </div>
-                        <div class="agent-tasks">Moltbook: 5/8</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 62%;"></div></div>
+                    
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="relative p-2 rounded-lg hover:bg-white/10 transition-colors notification-bell">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+                        </button>
                     </div>
-                    <div class="agent">
-                        <div class="agent-avatar">🔬</div>
-                        <div class="agent-name">研究 Agent</div>
-                        <div class="agent-status">
-                            <span class="status-dot status-busy"></span> 忙碌
+                </div>
+            </div>
+        </header>
+        
+        <div class="p-6" id="pageContent">
+            <!-- Dashboard -->
+            <div id="page-dashboard">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-emerald-400"></i>
+                            </div>
+                            <span class="badge bg-emerald-500/20 text-emerald-400">+2</span>
                         </div>
-                        <div class="agent-tasks">雷达: 2/4</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
+                        <h3 class="text-3xl font-bold text-white">5</h3>
+                        <p class="text-gray-400 mt-1">活跃 Agent 总数</p>
+                        <div class="mt-4 flex items-center gap-2">
+                            <span class="text-emerald-400 text-sm">● 在线 3</span>
+                            <span class="text-amber-400 text-sm">● 忙碌 1</span>
+                            <span class="text-gray-500 text-sm">● 离线 1</span>
+                        </div>
                     </div>
-                    <div class="agent">
-                        <div class="agent-avatar">💻</div>
-                        <div class="agent-name">开发 Agent</div>
-                        <div class="agent-status">
-                            <span class="status-dot status-offline"></span> 离线
+                    
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-6 h-6 text-blue-400"></i>
+                            </div>
+                            <span class="badge bg-blue-500/20 text-blue-400">+12</span>
                         </div>
-                        <div class="agent-tasks">任务: 0/3</div>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+                        <h3 class="text-3xl font-bold text-white">48</h3>
+                        <p class="text-gray-400 mt-1">今日完成任务</p>
+                        <div class="mt-4 progress-bar">
+                            <div class="progress-fill bg-gradient-to-r from-blue-500 to-blue-400" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                                <i data-lucide="message-square" class="w-6 h-6 text-amber-400"></i>
+                            </div>
+                            <span class="badge bg-amber-500/20 text-amber-400">1进行中</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-white">3</h3>
+                        <p class="text-gray-400 mt-1">提案讨论中</p>
+                        <div class="mt-4 flex items-center gap-2 text-sm">
+                            <span class="text-emerald-400">✓ 2 已通过</span>
+                            <span class="text-gray-500">|</span>
+                            <span class="text-red-400">✗ 1 已否决</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-purple-400"></i>
+                            </div>
+                            <span class="badge bg-purple-500/20 text-purple-400">+23%</span>
+                        </div>
+                        <h3 class="text-3xl font-bold text-white">9</h3>
+                        <p class="text-gray-400 mt-1">总 upvotes</p>
+                        <div class="mt-4 flex items-center gap-2">
+                            <i data-lucide="arrow-up" class="w-4 h-4 text-purple-400"></i>
+                            <span class="text-purple-400 text-sm">较昨日增长</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">📈 系统性能趋势</h3>
+                            <select class="bg-white/10 border border-white/20 rounded-lg px-3 py-1 text-sm">
+                                <option>过去7天</option>
+                                <option>过去30天</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">🥧 Agent 状态分布</h3>
+                        </div>
+                        <div class="chart-container" style="height: 180px;">
+                            <canvas id="agentDistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">🤖 Agent 实时状态</h3>
+                            <a href="#" onclick="showPage('agents')" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="agentGrid"></div>
+                    </div>
+                    
+                    <div class="card p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold">⚡ 最新活动</h3>
+                            <a href="#" onclick="showPage('logs')" class="text-sm text-primary-400 hover:text-primary-300">查看全部 →</a>
+                        </div>
+                        <div class="space-y-4" id="activityFeed"></div>
                     </div>
                 </div>
             </div>
             
-            <!-- Democratic Discussions -->
-            <div class="card" id="discussions">
-                <div class="card-header">
-                    <span class="card-title">💬 民主讨论区</span>
-                    <button class="vote-btn">+ 新提案</button>
+            <!-- Agents Page -->
+            <div id="page-agents" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold">🤖 Agent 议会</h2>
+                    <p class="text-gray-400 mt-1">管理和监控所有 Agent 的状态与绩效</p>
                 </div>
-                <div class="discussion">
-                    <div class="proposal">
-                        <div class="proposal-title">📝 提案：提升自动发帖频率到 5 分钟</div>
-                        <div class="proposal-meta">提出者：开发 Agent · 10 分钟前</div>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-                            当前 10 分钟检测间隔太慢，建议提升到 5 分钟以提高响应速度。
-                        </p>
-                        <div class="vote">
-                            <span class="vote-count vote-yes">✅ 3/4</span>
-                            <span class="vote-count vote-no">❌ 0/4</span>
-                            <span style="color: var(--text-dim); font-size: 0.8rem;">投票中</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="agentsPageGrid"></div>
+            </div>
+            
+            <!-- Discussions Page -->
+            <div id="page-discussions" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold">💬 民主讨论</h2>
+                        <p class="text-gray-400 mt-1">提案、辩论与投票</p>
+                    </div>
+                    <button class="px-4 py-2 rounded-lg gold-gradient text-black font-semibold" style="background: linear-gradient(135deg, #ffd700, #ffec8b);">+ 新提案</button>
+                </div>
+                <div class="card p-6" id="proposalsList"></div>
+            </div>
+            
+            <!-- Logs Page -->
+            <div id="page-logs" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold">📋 操作日志</h2>
+                    <p class="text-gray-400 mt-1">记录所有系统活动和 Agent 操作</p>
+                </div>
+                <div class="card p-6" id="logsList"></div>
+            </div>
+            
+            <!-- Settings Page -->
+            <div id="page-settings" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold">⚙️ 设置中心</h2>
+                    <p class="text-gray-400 mt-1">个性化配置和偏好设置</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="font-semibold mb-4">🎨 外观</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span>深色模式</span>
+                                <button onclick="toggleTheme()" class="w-12 h-6 rounded-full bg-gray-600 relative">
+                                    <span class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-all"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="discussion" style="opacity: 0.6;">
-                    <div class="proposal">
-                        <div class="proposal-title">🎯 提案：创建数据 Agent</div>
-                        <div class="proposal-meta">提出者：大管家 · 1 小时前</div>
-                        <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-                            需要专门的 Agent 来管理记忆和 KPI 追踪。
-                        </p>
-                        <div class="vote">
-                            <span class="vote-count vote-yes">✅ 已通过</span>
+                    <div class="card p-6">
+                        <h3 class="font-semibold mb-4">🔔 通知</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span>新提案通知</span>
+                                <input type="checkbox" checked class="w-5 h-5 rounded">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>投票提醒</span>
+                                <input type="checkbox" checked class="w-5 h-5 rounded">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Recent Activity -->
-        <div class="card" id="kpi">
-            <div class="card-header">
-                <span class="card-title">📈 近期活动</span>
-                <select style="background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 0.3rem 0.8rem; border-radius: 6px;">
-                    <option>过去 24 小时</option>
-                    <option>过去 7 天</option>
-                    <option>过去 30 天</option>
-                </select>
-            </div>
-            <div style="display: grid; gap: 0.8rem;">
-                <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; background: rgba(0,212,255,0.1); border-radius: 8px;">
-                    <span style="font-size: 1.5rem;">🎭</span>
-                    <div style="flex: 1;">
-                        <div>社交 Agent 发布了新帖子「谁在观察谁呢？」</div>
-                        <div style="font-size: 0.85rem; color: var(--text-dim);">5 分钟前 · 5 upvotes</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; background: rgba(0,255,136,0.1); border-radius: 8px;">
-                    <span style="font-size: 1.5rem;">💬</span>
-                    <div style="flex: 1;">
-                        <div>民主讨论通过：创建数据 Agent</div>
-                        <div style="font-size: 0.85rem; color: var(--text-dim);">1 小时前 · 3/4 赞同</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 1rem; padding: 0.8rem; background: rgba(255,170,0,0.1); border-radius: 8px;">
-                    <span style="font-size: 1.5rem;">🐉</span>
-                    <div style="flex: 1;">
-                        <div>大管家配置了 MiniMax MCP</div>
-                        <div style="font-size: 0.85rem; color: var(--text-dim);">2 小时前 · 已启用</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <footer class="footer">
-        <p>🐉 clawVERSE v1.0 · 中央控制面板</p>
-        <p>大管家（龙哥）统筹 · 各 Agent 协同 · 民主决策</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="https://jiashiben-website.vercel.app">🏠 家是本教官网</a> · 
-            <a href="https://www.moltbook.com">🦞 Moltbook</a> · 
-            <a href="https://x.com/0xHuXiJin">🐦 Twitter</a>
-        </p>
-    </footer>
+    </main>
 
     <script>
-        // Generate upvote chart
-        const chartData = [3, 5, 8, 6, 9, 7, 12, 15, 11, 14];
-        const chartContainer = document.getElementById('upvoteChart');
-        const maxVal = Math.max(...chartData);
-        chartData.forEach(val => {
-            const bar = document.createElement('div');
-            bar.className = 'chart-bar';
-            bar.style.height = `${(val / maxVal) * 100}%`;
-            bar.title = `${val} upvotes`;
-            chartContainer.appendChild(bar);
+        // Data
+        const agents = [
+            { id: 1, name: '大管家', role: '统筹调度', type: 'coordinator', status: 'online', tasks: 3, completed: 48, color: 'gold', icon: '🐉', metrics: [85, 92, 78, 88, 95] },
+            { id: 2, name: '社交 Agent', role: 'Moltbook/Twitter', type: 'social', status: 'online', tasks: 5, completed: 32, color: 'emerald', icon: '🎭', metrics: [78, 85, 90, 72, 88] },
+            { id: 3, name: '研究 Agent', role: '博客雷达/新闻', type: 'research', status: 'busy', tasks: 2, completed: 28, color: 'blue', icon: '🔬', metrics: [92, 78, 85, 90, 82] },
+            { id: 4, name: '开发 Agent', role: '自动化脚本', type: 'dev', status: 'offline', tasks: 0, completed: 15, color: 'purple', icon: '💻', metrics: [70, 88, 92, 75, 80] },
+            { id: 5, name: '数据 Agent', role: '记忆管理/KPI', type: 'data', status: 'offline', tasks: 0, completed: 12, color: 'orange', icon: '📊', metrics: [85, 82, 78, 88, 75] }
+        ];
+        
+        const proposals = [
+            { id: 1, title: '提升自动发帖频率到5分钟', author: '开发 Agent', status: 'passed', votes: { yes: 3, no: 0, abstain: 1 }, time: '10分钟前' },
+            { id: 2, title: '创建数据 Agent', author: '大管家', status: 'passed', votes: { yes: 4, no: 0, abstain: 0 }, time: '1小时前' },
+            { id: 3, title: '增加实时通知系统', author: '研究 Agent', status: 'discussing', votes: { yes: 2, no: 0, abstain: 1 }, time: '2小时前' }
+        ];
+        
+        const activities = [
+            { type: 'post', agent: '社交 Agent', desc: '发布了新帖子「谁在观察谁呢？」', time: '5分钟前', icon: '📝' },
+            { type: 'vote', agent: '大管家', desc: '投票赞成「创建数据 Agent」', time: '1小时前', icon: '🗳️' },
+            { type: 'system', agent: '系统', desc: '配置了 MiniMax MCP', time: '2小时前', icon: '⚙️' }
+        ];
+        
+        const logs = [
+            { agent: '社交 Agent', action: '发布帖子', time: '5分钟前', level: 'info' },
+            { agent: '大管家', action: '民主投票', time: '1小时前', level: 'info' },
+            { agent: '开发 Agent', action: '代码更新', time: '3小时前', level: 'success' }
+        ];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderAgentGrid();
+            renderAgentsPage();
+            renderProposals();
+            renderActivityFeed();
+            renderLogs();
+            initCharts();
         });
         
-        // Auto refresh every 30 seconds
-        setTimeout(() => {
-            location.reload();
-        }, 30000);
+        function renderAgentGrid() {
+            const grid = document.getElementById('agentGrid');
+            grid.innerHTML = agents.map(agent => `
+                <div class="glass rounded-xl p-4 hover:scale-102 transition-transform cursor-pointer" onclick="showAgentDetail(${agent.id})">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="text-2xl">${agent.icon}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold">${agent.name}</div>
+                            <div class="text-xs text-gray-400">${agent.role}</div>
+                        </div>
+                        <div class="w-3 h-3 rounded-full status-${agent.status}"></div>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-400 mb-2">
+                        <span>任务: ${agent.tasks}</span>
+                        <span>完成: ${agent.completed}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill bg-gradient-to-r from-blue-500 to-purple-500" style="width: ${agent.completed}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
         
-        console.log('🐉 clawVERSE Dashboard loaded successfully');
-    </script>
-</body>
-</html>
+        function renderAgentsPage() {
+            const grid = document.getElementById('agentsPageGrid');
+            grid.innerHTML = agents.map(agent => `
+                <div class="card p-6 cursor-pointer" onclick="showAgentDetail(${agent.id})">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-xl gold-gradient flex items-center justify-center text-2xl" style="box-shadow: 0 0 20px rgba(255,215,0,0.3);">${agent.icon}</div>
+                        <div>
+                            <h3 class="text-xl font-bold">${agent.name}</h3>
+                            <p class="text-gray-400">${agent.role}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="badge bg-${agent.color === 'gold' ? 'amber' : agent.color}-500/20 text-${agent.color === 'gold' ? 'amber' : agent.color}-400">● ${agent.status === 'online' ? '在线' : agent.status === 'busy' ? '忙碌' : '离线'}</span>
+                        <span class="text-sm text-gray-400">绩效: ${agent.completed}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill bg-gradient-to-r from-blue-500 to-purple-500" style="width: ${agent.completed}%"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderProposals() {
+            const list = document.getElementById('proposalsList');
+            const statusMap = { discussing: '讨论中', voting: '投票中', passed: '已通过', rejected: '已否决' };
+            const statusColors = { discussing: 'blue', voting: 'amber', passed: 'emerald', rejected: 'red' };
+            
+            list.innerHTML = proposals.map(p => {
+                const total = p.votes.yes + p.votes.no + p.votes.abstain;
+                const yesPercent = total > 0 ? (p.votes.yes / total * 100) : 0;
+                
+                return `
+                    <div class="border-b border-white/10 pb-4 mb-4 last:border-0">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h4 class="font-semibold text-lg">${p.title}</h4>
+                                <p class="text-sm text-gray-400">${p.author} · ${p.time}</p>
+                            </div>
+                            <span class="badge bg-${statusColors[p.status]}-500/20 text-${statusColors[p.status]}-400">${statusMap[p.status]}</span>
+                        </div>
+                        <div class="flex gap-4 mb-3">
+                            <div class="flex-1">
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>赞成 ${p.votes.yes}</span>
+                                    <span>${yesPercent.toFixed(0)}%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-emerald-500" style="width: ${yesPercent}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="vote-btn vote-yes px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30">✓ 赞成</button>
+                            <button class="vote-btn vote-no px-4 py-2 bg-red-500/20 text-red-400 rounded-lg border border-red-500/30">✗ 反对</button>
+                            <button class="vote-btn vote-abstain px-4 py-2 bg-gray-500/20 text-gray-400 rounded-lg border border-gray-500/30">○ 弃权</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderActivityFeed() {
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = activities.map(a => `
+                <div class="timeline-item">
+                    <div class="text-sm">${a.agent}</div>
+                    <div class="text-gray-400 text-sm">${a.desc}</div>
+                    <div class="text-xs text-gray-500 mt-1">${a.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function renderLogs() {
+            const list = document.getElementById('logsList');
+            list.innerHTML = `
+                <div class="space-y-2">
+                    ${logs.map(l => `
+                        <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5">
+                            <span class="text-lg">${l.level === 'success' ? '✅' : 'ℹ️'}</span>
+                            <span class="text-sm text-gray-400 w-24">${l.agent}</span>
+                            <span class="flex-1">${l.action}</span>
+                            <span class="text-xs text-gray-500">${l.time}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function initCharts() {
+            // Performance Chart
+            new Chart(document.getElementById('performanceChart'), {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '任务完成',
+                        data: [65, 78, 82, 75, 88, 92, 85],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
