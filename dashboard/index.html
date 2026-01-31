@@ -232,6 +232,13 @@
                 <i data-lucide="activity" class="w-5 h-5"></i><span>操作日志</span>
             </a>
             
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">开发</div>
+            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('devteam')">
+                <i data-lucide="code" class="w-5 h-5"></i>
+                <span>开发团队</span>
+                <span class="ml-auto badge bg-red-500/20 text-red-400">4</span>
+            </a>
+
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">系统</div>
             <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white" onclick="showPage('settings')">
                 <i data-lucide="settings" class="w-5 h-5"></i><span>设置中心</span>
@@ -623,3 +630,195 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+
+        // Dev Team Page
+        function showDevTeamPage() {
+            const team = [
+                { id: 1, name: '前端开发 Agent', role: 'UI/UX 构建', status: 'working', task: 'Dashboard v2.0 优化', progress: 75, color: 'blue', icon: '🎨' },
+                { id: 2, name: '后端开发 Agent', role: 'API/数据层', status: 'waiting', task: 'Bolt 数据库集成', progress: 30, color: 'green', icon: '⚙️' },
+                { id: 3, name: '测试工程师 Agent', role: '自动化测试', status: 'idle', task: '单元测试覆盖', progress: 0, color: 'amber', icon: '🧪' },
+                { id: 4, name: '文档工程师 Agent', role: '文档更新', status: 'idle', task: 'API 文档编写', progress: 0, color: 'purple', icon: '📚' },
+                { id: 5, name: 'Codex 审核员', role: 'Code Review + Bug修复', status: 'idle', task: '待审核代码', progress: 0, color: 'red', icon: '🔴' }
+            ];
+            
+            const tasks = [
+                { id: 1, title: '添加实时数据同步', priority: '高', assignee: '前端开发 Agent', status: 'in_progress', est: '2小时' },
+                { id: 2, title: '实现 WebSocket 通知', priority: '高', assignee: '后端开发 Agent', status: 'pending', est: '3小时' },
+                { id: 3, title: '编写测试用例', priority: '中', assignee: '测试工程师 Agent', status: 'pending', est: '4小时' },
+                { id: 4, title: '更新 API 文档', priority: '低', assignee: '文档工程师 Agent', status: 'pending', est: '2小时' }
+            ];
+            
+            const devTeamHTML = `
+                <div id="page-devteam" class="hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold">🏗️ 开发团队控制台</h2>
+                            <p class="text-gray-400 mt-1">并行开发 · 民主分配 · Codex 审核</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="assignTasks()" class="px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                📋 分配任务
+                            </button>
+                            <button onclick="startParallelWork()" class="px-4 py-2 rounded-lg gold-gradient text-black font-semibold">
+                                🚀 开始并行开发
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Status -->
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                        ${team.map(t => `
+                            <div class="card p-4 ${t.status === 'working' ? 'border-blue-500/50' : ''}" onclick="showAgentTask(${t.id})">
+                                <div class="text-center mb-3">
+                                    <div class="text-3xl mb-2">${t.icon}</div>
+                                    <div class="font-semibold text-sm">${t.name.split(' ')[0]}</div>
+                                    <div class="text-xs text-gray-400">${t.role}</div>
+                                </div>
+                                <div class="flex items-center justify-center gap-2 mb-2">
+                                    <span class="w-2 h-2 rounded-full status-${t.status === 'working' ? 'busy' : t.status === 'waiting' ? 'busy' : 'offline'}"></span>
+                                    <span class="text-xs text-gray-400">${t.status === 'working' ? '开发中' : t.status === 'waiting' ? '待命中' : '空闲'}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill bg-${t.color === 'blue' ? 'blue' : t.color === 'green' ? 'emerald' : t.color === 'amber' ? 'amber' : t.color === 'purple' ? 'purple' : 'red'}-500" style="width: ${t.progress}%"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Task Board -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-6">
+                            <h3 class="font-semibold mb-4">📋 待分配任务</h3>
+                            <div class="space-y-3">
+                                ${tasks.filter(t => t.status === 'pending').map(t => `
+                                    <div class="glass rounded-lg p-4 cursor-pointer hover:bg-white/5" onclick="assignToAgent(${t.id})">
+                                        <div class="flex items-center justify-between mb-2">
+                    <span class="badge bg-${t.priority === '高' ? 'red' : t.priority === '中' ? 'amber' : 'gray'}-500/20 text-${t.priority === '高' ? 'red' : t.priority === '中' ? 'amber' : 'gray'}-400">${t.priority}优先</span>
+                                            <span class="text-xs text-gray-500">⏱️ ${t.est}</span>
+                                        </div>
+                                        <div class="font-medium">${t.title}</div>
+                                        <div class="text-xs text-gray-400 mt-1">预计分配给: ${t.assignee}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="card p-6">
+                            <h3 class="font-semibold mb-4">🔴 Codex 审核队列</h3>
+                            <div class="text-center py-8 text-gray-400">
+                                <div class="text-4xl mb-3">🔍</div>
+                                <p>等待代码提交...</p>
+                                <p class="text-sm mt-2">Codex 将自动检测并审核</p>
+                            </div>
+                            <button onclick="simulateCodeSubmit()" class="w-full mt-4 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors">
+                                📝 模拟提交代码
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Parallel Work Progress -->
+                    <div class="card p-6 mt-6">
+                        <h3 class="font-semibold mb-4">⚡ 并行开发进度</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <span class="w-32 text-sm text-gray-400">前端开发</span>
+                                <div class="flex-1 progress-bar">
+                                    <div class="progress-fill bg-blue-500" style="width: 75%"></div>
+                                </div>
+                                <span class="text-sm">75%</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="w-32 text-sm text-gray-400">后端开发</span>
+                                <div class="flex-1 progress-bar">
+                                    <div class="progress-fill bg-emerald-500" style="width: 30%"></div>
+                                </div>
+                                <span class="text-sm">30%</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="w-32 text-sm text-gray-400">自动化测试</span>
+                                <div class="flex-1 progress-bar">
+                                    <div class="progress-fill bg-amber-500" style="width: 0%"></div>
+                                </div>
+                                <span class="text-sm">0%</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span class="w-32 text-sm text-gray-400">Codex 审核</span>
+                                <div class="flex-1 progress-bar">
+                                    <div class="progress-fill bg-red-500" style="width: 0%"></div>
+                                </div>
+                                <span class="text-sm">待开始</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return devTeamHTML;
+        }
+        
+        // Page navigation
+        function showPage(page) {
+            document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+            const pageEl = document.getElementById('page-' + page);
+            if (pageEl) {
+                pageEl.classList.remove('hidden');
+                pageEl.classList.add('page-enter-active');
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.target.closest('.nav-item')?.classList.add('active');
+            
+            document.getElementById('currentPage').textContent = {
+                'dashboard': '控制台',
+                'agents': 'Agent议会',
+                'discussions': '民主讨论',
+                'logs': '操作日志',
+                'settings': '设置中心',
+                'devteam': '开发团队'
+            }[page] || page;
+        }
+        
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+        
+        function toggleNotifications() {
+            document.getElementById('notificationDropdown').classList.toggle('hidden');
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+        }
+        
+        // Simulate functions
+        function assignTasks() {
+            alert('📋 任务分配系统\n\n民主讨论后自动分配任务给各 Agent');
+        }
+        
+        function startParallelWork() {
+            alert('🚀 开始并行开发！\n\n所有 Agent 同时开始工作...');
+        }
+        
+        function simulateCodeSubmit() {
+            alert('📝 模拟代码提交\n\n提交到 Codex 审核队列...\n\n✅ Codex 审核中...\n\n发现 3 个小问题:\n1. 缺少错误边界处理\n2. 性能可优化\n3. 注释需完善\n\n🔧 自动修复中...');
+        }
+        
+        function showAgentDetail(id) {
+            alert(`🤖 Agent #${id} 详情页\n\n展示详细性能数据和历史记录`);
+        }
+        
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                alert(`🔍 搜索: ${e.target.value}\n\n找到相关结果 5 条`);
+            }
+        }
+        
+        // Close dropdowns
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.relative')) {
+                document.getElementById('notificationDropdown')?.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
