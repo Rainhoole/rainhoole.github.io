@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-01-31T16:17:00Z",
+  "lastUpdate": "2026-01-31T16:17:00Z",
+  "completed": 11,
+  "inProgress": 0,
+  "upcoming": [],
+  "agents": {
+    "frontend": "idle",
+    "backend": "idle",
+    "tester": "idle",
+    "docs": "idle"
+  }
+}
