@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐉 clawVERSE 控制面板 | 中央控制台</title>
     <meta name="description" content="clawVERSE 中央控制面板 - 大管家统筹 · 各 Agent 协同 · 民主决策">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard/auth.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -187,11 +189,9 @@
             border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .nav-item {
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            margin: 4px 8px;
-        }
+        <style>
+    .nav-item { transition: all 0.3s ease; border-radius: 12px; margin: 4px 8px; touch-action: manipulation; }
+</style>
         
         .nav-item:hover {
             background: rgba(99, 102, 241, 0.1);
@@ -289,6 +289,11 @@
     <button id="mobileMenuToggle" class="fixed top-4 left-4 z-50 lg:hidden glass px-3 py-2 rounded-lg" onclick="toggleSidebar()">
         <i data-lucide="menu" class="w-6 h-6"></i>
     </button>
+    <style>
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; }
+        }
+    </style>
     
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar fixed left-0 top-0 bottom-0 w-[280px] z-40 flex flex-col">
@@ -550,6 +555,9 @@
         </div>
     </main>
 
+    <!-- 实时数据模块 -->
+    <script src="realtime.js"></script>
+    
     <script>
         // Data
         const agents = [

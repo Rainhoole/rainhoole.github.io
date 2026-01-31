@@ -30,6 +30,71 @@ const taskStatus = {
   FAILED: 'failed'
 };
 
+// ============== 用户数据库 (内存存储) ==============
+const usersDB = new Map([
+  ['admin', {
+    id: 'user-001',
+    username: 'admin',
+    password: 'admin123', // 实际项目中应为 bcrypt 哈希
+    email: 'admin@clawverse.com',
+    role: 'admin',
+    permissions: ['read', 'write', 'delete', 'admin'],
+    createdAt: '2024-01-01T00:00:00Z',
+    lastLogin: null
+  }],
+  ['user', {
+    id: 'user-002',
+    username: 'user',
+    password: 'user123',
+    email: 'user@clawverse.com',
+    role: 'user',
+    permissions: ['read'],
+    createdAt: '2024-01-15T00:00:00Z',
+    lastLogin: null
+  }]
+]);
+
+// ============== Token 生成 ==============
+function generateToken() {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function generateJWT(payload) {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const tokenPayload = {
+    ...payload,
+    iat: now,
+    exp: now + (30 * 60) // 30分钟过期
+  };
+  const base64Header = btoa(JSON.stringify(header));
+  const base64Payload = btoa(JSON.stringify(tokenPayload));
+  const signature = generateToken().substring(0, 43);
+  return `${base64Header}.${base64Payload}.${signature}`;
+}
+
+function parseJWT(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    return {
+      header: JSON.parse(atob(parts[0])),
+      payload: JSON.parse(atob(parts[1])),
+      signature: parts[2]
+    };
+  } catch {
+    return null;
+  }
+}
+
+function isTokenExpired(token) {
+  const decoded = parseJWT(token);
+  if (!decoded) return true;
+  return decoded.payload.exp < Math.floor(Date.now() / 1000);
+}
+
 function createTask(name, description) {
   const task = {
     id: `task-${Date.now()}`,
@@ -181,6 +246,117 @@ const routes = {
       }
       return sendJson(res, 200, { success: true, data: task });
     });
+  },
+
+  // ========== 认证路由 ==========
+  'POST:/api/auth/login': (req, res) => {
+    getJsonBody(req, res, (err, body) => {
+      const { username, password } = body || {};
+      if (!username || !password) {
+        return sendJson(res, 400, { success: false, error: 'Username and password are required' });
+      }
+      const user = usersDB.get(username);
+      if (!user || user.password !== password) {
+        return sendJson(res, 401, { success: false, error: 'Invalid username or password' });
+      }
+      
+      // 生成 token
+      const token = generateJWT({
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+        permissions: user.permissions
+      });
+      const refreshToken = generateToken();
+      
+      // 更新最后登录
+      user.lastLogin = new Date().toISOString();
+      
+      // 返回用户信息(不含密码)
+      const safeUser = { ...user };
+      delete safeUser.password;
+      
+      return sendJson(res, 200, { 
+        success: true, 
+        data: { token, refreshToken, user: safeUser } 
+      });
+    });
+  },
+
+  'POST:/api/auth/register': (req, res) => {
+    getJsonBody(req, res, (err, body) => {
+      const { username, password, email } = body || {};
+      
+      if (!username || !password || !email) {
+        return sendJson(res, 400, { success: false, error: 'All fields are required' });
+      }
+      if (username.length < 3 || username.length > 20) {
+        return sendJson(res, 400, { success: false, error: 'Username must be 3-20 characters' });
+      }
+      if (password.length < 6) {
+        return sendJson(res, 400, { success: false, error: 'Password must be at least 6 characters' });
+      }
+      if (usersDB.has(username)) {
+        return sendJson(res, 409, { success: false, error: 'Username already exists' });
+      }
+      
+      const newUser = {
+        id: `user-${Date.now()}`,
+        username,
+        password,
+        email,
+        role: 'user',
+        permissions: ['read'],
+        createdAt: new Date().toISOString(),
+        lastLogin: null
+      };
+      
+      usersDB.set(username, newUser);
+      
+      const safeUser = { ...newUser };
+      delete safeUser.password;
+      
+      return sendJson(res, 201, { success: true, data: { user: safeUser } });
+    });
+  },
+
+  'POST:/api/auth/verify': (req, res) => {
+    getJsonBody(req, res, (err, body) => {
+      const { token } = body || {};
+      if (!token) {
+        return sendJson(res, 400, { success: false, error: 'Token is required' });
+      }
+      
+      if (isTokenExpired(token)) {
+        return sendJson(res, 401, { success: false, error: 'Token expired' });
+      }
+      
+      const decoded = parseJWT(token);
+      if (!decoded) {
+        return sendJson(res, 401, { success: false, error: 'Invalid token' });
+      }
+      
+      return sendJson(res, 200, { success: true, data: { valid: true, user: decoded.payload } });
+    });
+  },
+
+  'POST:/api/auth/refresh': (req, res) => {
+    getJsonBody(req, res, (err, body) => {
+      const { refreshToken } = body || {};
+      // 简化处理：验证 refreshToken 格式
+      if (!refreshToken || refreshToken.length < 10) {
+        return sendJson(res, 401, { success: false, error: 'Invalid refresh token' });
+      }
+      
+      // 从数据库获取用户信息（简化实现）
+      // 实际应验证 refreshToken 是否有效
+      return sendJson(res, 200, { success: false, error: 'Token refresh not implemented in demo' });
+    });
+  },
+
+  'POST:/api/auth/logout': (req, res) => {
+    // 客户端清除 token，服务端记录日志
+    return sendJson(res, 200, { success: true, message: 'Logged out successfully' });
   }
 };
 
