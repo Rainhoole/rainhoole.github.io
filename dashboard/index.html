@@ -1,129 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>clawVERSE Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- 侧边导航 -->
-        <aside class="sidebar">
-            <div class="logo">
-                <h1>🦌 clawVERSE</h1>
-            </div>
-            <nav>
-                <ul>
-                    <li class="active" data-page="overview">
-                        <span class="icon">📊</span>
-                        <span class="text" data-translate-key="overview"></span>
-                    </li>
-                    <li data-page="agents">
-                        <span class="icon">🤖</span>
-                        <span class="text" data-translate-key="agents"></span>
-                    </li>
-                    <li data-page="proposals">
-                        <span class="icon">📝</span>
-                        <span class="text" data-translate-key="proposals"></span>
-                    </li>
-                    <li data-page="tasks">
-                        <span class="icon">📋</span>
-                        <span class="text" data-translate-key="tasks"></span>
-                    </li>
-                    <li data-page="logs">
-                        <span class="icon">📜</span>
-                        <span class="text">操作日志</span>
-                    </li>
-                    <li data-page="settings">
-                        <span class="icon">⚙️</span>
-                        <span class="text">设置中心</span>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- 主内容区 -->
-        <main class="main-content">
-            <!-- 顶部工具栏 -->
-            <header class="toolbar">
-                <div class="search-box">
-                    <input type="text" placeholder="搜索..." id="global-search">
-                    <button class="search-btn">🔍</button>
-                </div>
-                <div class="toolbar-actions">
-                    <select id="language-select">
-                        <option value="en">English</option>
-                        <option value="zh">中文</option>
-                    </select>
-                    <!-- 数据导出按钮组 -->
-                    <div class="export-dropdown">
-                        <button class="btn btn-primary" id="export-menu-btn">
-                            📤 导出数据
-                        </button>
-                        <div class="export-menu" id="export-menu">
-                            <button id="export-csv-btn" class="export-option">
-                                <span class="icon">📄</span>
-                                <span class="text">导出 CSV</span>
-                            </button>
-                            <button id="export-json-btn" class="export-option">
-                                <span class="icon">📋</span>
-                                <span class="text">导出 JSON</span>
-                            </button>
-                            <button id="export-all-btn" class="export-option">
-                                <span class="icon">📦</span>
-                                <span class="text">导出所有数据</span>
-                            </button>
-                            <button id="export-report-btn" class="export-option">
-                                <span class="icon">📊</span>
-                                <span class="text">生成报告</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button class="btn btn-secondary" id="refresh-btn">🔄 刷新</button>
-                    <button class="btn btn-secondary" id="theme-toggle">🌙</button>
-                </div>
-            </header>
-
-            <!-- 数据展示区 -->
-            <div class="content-area" id="main-view">
-                <!-- 页面内容将动态加载 -->
-            </div>
-
-            <!-- 底部状态栏 -->
-            <footer class="status-bar">
-                <span id="status-left">就绪</span>
-                <span id="status-center">
-                    <span id="selected-count">已选择 0 项</span>
-                </span>
-                <span id="status-right">
-                    <span id="connection-status">🟢 已连接</span>
-                    <span id="user-info">👤 游客</span>
-                </span>
-            </footer>
-        </main>
-    </div>
-
-    <!-- 模态框 -->
-    <div class="modal" id="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title" data-translate-key="modalTitle">标题</h3>
-                <button class="modal-close" id="modal-close">&times;</button>
-            </div>
-            <div class="modal-body" id="modal-body" data-translate-key="modalContent">
-                内容
-            </div>
-        </div>
-    </div>
-
-    <!-- 脚本引用 -->
-    <script src="api.js"></script>
-    <script src="auth.js"></script>
-    <script src="realtime.js"></script>
-    <script src="notifications.js"></script>
-    <script src="search.js"></script>
-    <script src="export.js"></script>
-    <script src="app.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>clawVERSE Control Panel Dashboard</title>
+    <meta property="og:image" content="https://bolt.new/static/og_default.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
+    <script type="module" crossorigin src="/assets/index-Cwp1Teua.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D4kOTzWJ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
